@@ -35,16 +35,22 @@ function toSrt(whisperResponses: WhisperResponse[]): string {
     whisperResponses.sort((a, b) => a.offset - b.offset);
     let counter = 1;
     const lines: SrtLine[] = [];
-    for (const wr of whisperResponses) {
-        for (const segment of wr.segments) {
-            lines.push({
-                index: counter,
-                start: segment.start + wr.offset,
-                end: segment.end + wr.offset,
-                contentEn: segment.text,
-                contentZh: ''
-            });
-            counter++;
+    if (whisperResponses) {
+        for (const wr of whisperResponses) {
+            if (wr && wr.segments) {
+                for (const segment of wr.segments) {
+                    if (segment && 'start' in segment && 'end' in segment && 'text' in segment && 'offset' in wr) {
+                        lines.push({
+                            index: counter,
+                            start: segment.start + wr.offset,
+                            end: segment.end + wr.offset,
+                            contentEn: segment.text,
+                            contentZh: ''
+                        });
+                        counter++;
+                    }
+                }
+            }
         }
     }
     return SrtUtil.toSrt(lines);
